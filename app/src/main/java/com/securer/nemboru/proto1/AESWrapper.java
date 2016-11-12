@@ -3,6 +3,10 @@ package com.securer.nemboru.proto1;
 import android.util.Base64;
 
 import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
 
 /**
  * Created by nemboru on 12/11/16.
@@ -21,7 +25,7 @@ public class AESWrapper {
         return "";
     }
 
-    public static String Decrypt(String key, String payload){
+    public static String Decrypt(String key, String payload) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
         byte[] newkey = PasswordDerivation.derive(key);
         byte[] content = Base64.decode(payload,Base64.DEFAULT);
         byte[] cpayload = AEScrypt.decrypt(newkey, content);

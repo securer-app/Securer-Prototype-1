@@ -22,14 +22,23 @@ public class AEScrypt {
     public static Cipher cipher;
 
     public static byte[] encrypt(byte[] key, byte[] payload) {
-        return work(key, payload, true);
+        try {
+            return work(key, payload, true);
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (BadPaddingException e) {
+            e.printStackTrace();
+        } catch (IllegalBlockSizeException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
-    public static byte[] decrypt(byte[] key, byte[] payload){
+    public static byte[] decrypt(byte[] key, byte[] payload) throws BadPaddingException, InvalidKeyException, IllegalBlockSizeException {
         return work(key, payload, false);
     }
 
-    public static byte[] work(byte[] key, byte[] payload,boolean encrypt){
+    public static byte[] work(byte[] key, byte[] payload,boolean encrypt) throws InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         Security.addProvider(new BouncyCastleProvider());
 
         try {
@@ -39,21 +48,13 @@ public class AEScrypt {
         } catch (NoSuchPaddingException e) {
             e.printStackTrace();
         }
-        Key parsedKey = new SecretKeySpec(key,"AES");
-        try {
-            if(encrypt){
-                cipher.init(Cipher.ENCRYPT_MODE, parsedKey);
-            }else{
-                cipher.init(Cipher.DECRYPT_MODE, parsedKey);
-            }
-            return cipher.doFinal(payload);
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
+
+        Key parsedKey = new SecretKeySpec(key, "AES");
+        if (encrypt) {
+            cipher.init(Cipher.ENCRYPT_MODE, parsedKey);
+        } else {
+            cipher.init(Cipher.DECRYPT_MODE, parsedKey);
         }
-        return null;
+        return cipher.doFinal(payload);
     }
 }
