@@ -1,0 +1,35 @@
+package com.securer.nemboru.proto1;
+
+import android.util.Base64;
+
+import java.io.UnsupportedEncodingException;
+
+/**
+ * Created by nemboru on 12/11/16.
+ */
+
+public class AESWrapper {
+    public static String Encrypt(String key, String payload){
+        byte[] newkey = PasswordDerivation.derive(key);
+        try {
+            byte[] cpayload = AEScrypt.encrypt(newkey, payload.toString().getBytes("UTF-8"));
+            String printpayload = Base64.encodeToString(cpayload,Base64.DEFAULT);
+            return printpayload;
+        } catch (UnsupportedEncodingException e) {
+            //    e.printStackTrace();
+        }
+        return "";
+    }
+
+    public static String Decrypt(String key, String payload){
+        byte[] newkey = PasswordDerivation.derive(key);
+        byte[] content = Base64.decode(payload,Base64.DEFAULT);
+        byte[] cpayload = AEScrypt.decrypt(newkey, content);
+        try {
+            return new String(cpayload,"UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+}
